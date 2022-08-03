@@ -1,0 +1,237 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "Dhruv",
+    "version": "1.0.0",
+    "title": "Flask Swagger UI",
+    "contact": {
+      "email": "dhruv281100@gmail.com"
+    }
+  },
+  "paths": {
+    "/home": {
+      "get": {
+        "tags": [
+          "Home Page"
+        ],
+        "summary": "Returns home page",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logs user by providing access token",
+        "requestBody": {
+          "description": "email id and password for registration ",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid password supplied"
+          },
+          "404": {
+            "description": "Invalid data"
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Registers new user",
+        "requestBody": {
+          "description": "email id and password for registration ",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid data"
+          }
+        }
+      }
+    },
+    "/reset_password_request": {
+      "post": {
+        "tags": [
+          "Password"
+        ],
+        "summary": "Returns token which can be used to reset password when user forgets password",
+        "requestBody": {
+          "description": "email id for which the password needs to be reset",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "token generated successfully"
+          },
+          "400": {
+            "description": "Enter proper data"
+          },
+          "404": {
+            "description": "Invalid email id. Please enter valid email."
+          }
+        }
+      }
+    },
+    "/reset_password": {
+      "post": {
+        "tags": [
+          "Password"
+        ],
+        "summary": "Accepts token and if its valid then user can change reset password",
+        "requestBody": {
+          "description": "reset token generated from reset password request and new password",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPassword"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successful"
+          },
+          "400": {
+            "description": "Invalid data"
+          }
+        }
+      }
+    },
+    "/change_password": {
+      "post": {
+        "tags": [
+          "Password"
+        ],
+        "summary": "Change password after user has logged in",
+        "requestBody": {
+          "description": "enter current password and if its valid then entered new password will replace old password",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePassword"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Password changed successfully"
+          },
+          "400": {
+            "description": "Invalid data"
+          }
+        }
+      }
+    },
+    "/profile": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Fetch user data",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "ResetPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "ResetPassword": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "ChangePassword": {
+        "type": "object",
+        "properties": {
+          "current_password": {
+            "type": "string"
+          },
+          "new_password": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
+
