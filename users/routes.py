@@ -1,7 +1,7 @@
 from flask import Blueprint
 from users.resources import Registration, Login, Profile, ResetPasswordRequest, ResetPassword, ChangePassword
 
-users = Blueprint("users", __name__)
+users = Blueprint("test_users", __name__)
 
 users.add_url_rule("/register", view_func=Registration.as_view("register"))
 users.add_url_rule("/login", view_func=Login.as_view("login"))

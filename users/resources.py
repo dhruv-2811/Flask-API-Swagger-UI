@@ -1,20 +1,23 @@
 from flask import request
 from flask_api import status
 from flask_restful import Resource
+from marshmallow import ValidationError
 from sqlalchemy.exc import DataError
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app import bcrypt, db
 from users.models import User
+from users.schemas import RegisterUserSchema, ProfileSchema
 from users.utils import get_reset_token, verify_reset_token
-from users.validations import validate_email, validate_password
+from users.validations import validate_password
 
 
 class Registration(Resource):
 
     def post(self):
+        register_user_schema = RegisterUserSchema()
         user_json = request.get_json()
-
         try:
+
             user = User.query.filter_by(email=user_json['email']).first()
             if user:
                 return {"data": [],
@@ -22,24 +25,59 @@ class Registration(Resource):
                         "status": "false"
                         }, status.HTTP_400_BAD_REQUEST
 
-            if not validate_email(user_json["email"]):
-                return {"data": [],
-                        "message": "Please enter proper email",
-                        "status": "false"
-                        }, status.HTTP_400_BAD_REQUEST
+            # if not validate_name(user_json["first_name"]):
+            #     return {"data": [],
+            #             "message": "Please Enter proper first name only including alphabets.",
+            #             "status": "false"
+            #             }, status.HTTP_400_BAD_REQUEST
 
-            if not validate_password(user_json["password"]):
-                return {"data": [],
-                        "message": "Please enter proper password",
-                        "status": "false"
-                        }, status.HTTP_400_BAD_REQUEST
+            # if not validate_name(user_json["last_name"]):
+            #     return {"data": [],
+            #             "message": "Please Enter proper last name only including alphabets.",
+            #             "status": "false"
+            #             }, status.HTTP_400_BAD_REQUEST
+
+            # if not validate_number(user_json["phone_number"]):
+            #     return {"data": [],
+            #             "message": "Please enter proper number starting from 6 - 9 and should be of 10 digits.",
+            #             "status": "false"
+            #             }, status.HTTP_400_BAD_REQUEST
+
+            # if not validate_gender(user_json["gender"].lower()):
+            #     return {"data": [],
+            #             "message": "Please Enter proper gender like male or m or female or f",
+            #             "status": "false"
+            #             }, status.HTTP_400_BAD_REQUEST
+            #
+            # if not validate_email(user_json["email"]):
+            #     return {"data": [],
+            #             "message": "Please enter proper email",
+            #             "status": "false"
+            #             }, status.HTTP_400_BAD_REQUEST
+            #
+            # if not validate_password(user_json["password"]):
+            #     return {"data": [],
+            #             "message": "Please enter proper password",
+            #             "status": "false"
+            #             }, status.HTTP_400_BAD_REQUEST
+
+            # user_object = User(email=user_json['email'], password=hashed_password)
+            # user_object.save_to_db()
+            register_user = register_user_schema.load(user_json)
             hashed_password = bcrypt.generate_password_hash(user_json['password']).decode('utf-8')
-            user_object = User(email=user_json['email'], password=hashed_password)
-            user_object.save_to_db()
+            register_user.password = hashed_password
+            register_user.save_to_db()
             return {"data": request.get_json(),
                     "message": "User Register Successfully",
                     "status": "true"
                     }, status.HTTP_201_CREATED
+
+        except ValidationError as err:
+            return {"errors": err.messages,
+                    "message": "Please solve the errors and try again",
+                    "status": "false"
+                    }, status.HTTP_400_BAD_REQUEST
+
         except (KeyError, AttributeError, DataError) as err:
             return {"data": [],
                     "message": "Please enter proper data",
@@ -82,7 +120,9 @@ class Profile(Resource):
 
     def get(self):
         user = User.query.filter_by(id=get_jwt_identity()).first()
-        return {"data": {"id": user.id, "email": user.email},
+        profile_schema = ProfileSchema()
+        profile_data = profile_schema.dump(user)
+        return {"data": profile_data,
                 "message": "user data fetched successfully",
                 "status": "true"
                 }, status.HTTP_200_OK
@@ -135,6 +175,7 @@ class ResetPassword(Resource):
                         "message": "Please enter proper password",
                         "status": "false"
                         }, status.HTTP_400_BAD_REQUEST
+
             hashed_password = bcrypt.generate_password_hash(reset_password_json["password"]).decode('utf-8')
             user.password = hashed_password
             db.session.commit()
@@ -153,7 +194,7 @@ class ResetPassword(Resource):
 class ChangePassword(Resource):
     decorators = [jwt_required()]
 
-    def post(self):
+    def put(self):
         password_json_data = request.get_json()
         user = User.query.filter_by(id=get_jwt_identity()).first()
         try:

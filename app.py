@@ -7,11 +7,14 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_swagger_ui import get_swaggerui_blueprint
 from config import Config
+from flask_marshmallow import Marshmallow
+
 
 load_dotenv()
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
+ma = Marshmallow()
 
 
 def create_app(config_class=Config):
@@ -30,6 +33,7 @@ def create_app(config_class=Config):
         }
     )
     app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
+    ma = Marshmallow(app)
     db.init_app(app)
     from users import models
     Migrate(app, db)

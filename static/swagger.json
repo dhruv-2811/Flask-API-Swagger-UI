@@ -9,19 +9,6 @@
     }
   },
   "paths": {
-    "/home": {
-      "get": {
-        "tags": [
-          "Home Page"
-        ],
-        "summary": "Returns home page",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/login": {
       "post": {
         "tags": [
@@ -33,7 +20,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/User"
+                "$ref": "#/components/schemas/LoginUser"
               }
             }
           }
@@ -62,7 +49,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/User"
+                "$ref": "#/components/schemas/RegisterUser"
               }
             }
           }
@@ -111,7 +98,7 @@
         "tags": [
           "Password"
         ],
-        "summary": "Accepts token and if its valid then user can change reset password",
+        "summary": "Accepts token and if its valid then user can reset password",
         "requestBody": {
           "description": "reset token generated from reset password request and new password",
           "content": {
@@ -133,7 +120,7 @@
       }
     },
     "/change_password": {
-      "post": {
+      "put": {
         "tags": [
           "Password"
         ],
@@ -190,14 +177,45 @@
       }
     },
     "schemas": {
-      "User": {
+      "LoginUser": {
         "type": "object",
         "properties": {
           "email": {
-            "type": "string"
+            "type": "string",
+            "example": "string@gmail.com"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "example": "Abc@123"
+          }
+        }
+      },
+      "RegisterUser": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "example": "firstname"
+          },
+          "last_name": {
+            "type": "string",
+            "example": "lastname"
+          },
+          "phone_number": {
+            "type": "integer",
+            "example": 9876543210
+          },
+          "gender": {
+            "type": "string",
+            "example": "male"
+          },
+          "email": {
+            "type": "string",
+            "example": "string@gmail.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "Abc@123"
           }
         }
       },
@@ -205,7 +223,8 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string"
+            "type": "string",
+            "example": "string@gmail.com"
           }
         }
       },
@@ -213,10 +232,12 @@
         "type": "object",
         "properties": {
           "token": {
-            "type": "string"
+            "type": "string",
+            "example": "token"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "example": "Abc@123"
           }
         }
       },
@@ -224,10 +245,12 @@
         "type": "object",
         "properties": {
           "current_password": {
-            "type": "string"
+            "type": "string",
+            "example": "Abc@123"
           },
           "new_password": {
-            "type": "string"
+            "type": "string",
+            "example": "Abc@123"
           }
         }
       }
